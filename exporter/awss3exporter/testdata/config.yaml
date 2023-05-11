@@ -8,6 +8,7 @@ exporters:
         s3_bucket: 'foo'
         s3_prefix: 'bar'
         s3_partition: 'minute'
+        aws_endpoint: "http://endpoint.com"
 
 processors:
   nop:

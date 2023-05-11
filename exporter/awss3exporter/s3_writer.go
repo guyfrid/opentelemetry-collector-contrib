@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"os"
 	"strconv"
 	"time"
 
@@ -57,6 +58,15 @@ func getS3Key(time time.Time, keyPrefix string, partition string, filePrefix str
 	return s3Key
 }
 
+func getAwsEndpoint(config *Config) string {
+	endpoint := config.S3Uploader.AwsEndpoint
+	if endpoint == "" {
+		endpoint = os.Getenv("AWS_ENDPOINT_URL")
+	}
+
+	return endpoint
+}
+
 func (s3writer *s3Writer) writeBuffer(ctx context.Context, buf []byte, config *Config, metadata string, format string) error {
 	now := time.Now()
 	key := getS3Key(now,
@@ -67,8 +77,9 @@ func (s3writer *s3Writer) writeBuffer(ctx context.Context, buf []byte, config *C
 	reader := bytes.NewReader(buf)
 
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(config.S3Uploader.Region)},
-	)
+		Region:   aws.String(config.S3Uploader.Region),
+		Endpoint: aws.String(getAwsEndpoint(config)),
+	})
 
 	if err != nil {
 		return err

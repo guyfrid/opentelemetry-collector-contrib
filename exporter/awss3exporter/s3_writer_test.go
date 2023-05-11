@@ -50,3 +50,22 @@ func TestS3Key(t *testing.T) {
 	matched := re.MatchString(s3Key)
 	assert.Equal(t, true, matched)
 }
+
+func TestGetAwsEndpoint(t *testing.T) {
+	const endpointURL = "https://endpoint.com"
+	config := &Config{
+		S3Uploader: S3UploaderConfig{
+			AwsEndpoint: endpointURL,
+		},
+	}
+	ep := getAwsEndpoint(config)
+	assert.Equal(t, ep, endpointURL)
+}
+
+func TestGetAwsEndpointNoConfigure(t *testing.T) {
+	const endpointURL = "https://default_endpoint.com"
+	t.Setenv("AWS_ENDPOINT_URL", endpointURL)
+	config := &Config{}
+	ep := getAwsEndpoint(config)
+	assert.Equal(t, ep, endpointURL)
+}
